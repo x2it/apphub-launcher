@@ -1,0 +1,19 @@
+// Top-level build file
+// 通过 buildscript classpath 方式引用 AGP/Kotlin/KSP 插件，更兼容不同镜像/代理
+buildscript {
+    repositories {
+        maven { url = uri("https://dl.google.com/dl/android/maven2/") }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:8.5.2"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21"
+        classpath "org.jetbrains.kotlin:compose-compiler-gradle-plugin:2.0.21"
+        classpath "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:2.0.21-1.0.27"
+    }
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}

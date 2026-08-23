@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 让启动页背景匹配 Win11 浅色，避免启动白屏 -->
+<resources>
+    <style name="Theme.AppHub" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#F3F3F3</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowBackground">#F3F3F3</item>
+        <item name="android:navigationBarColor">#F3F3F3</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+</resources>

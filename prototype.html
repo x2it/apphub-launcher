@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AppHub · 启动器</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ===== Win11 设计令牌 ===== */
+  :root {
+    --bg: #f3f3f3;
+    --mica: rgba(243, 243, 243, 0.7);
+    --mica-blur: rgba(255, 255, 255, 0.6);
+    --card: #ffffff;
+    --card-hover: #f5f5f5;
+    --tile: transparent;
+    --tile-hover: rgba(0, 0, 0, 0.04);
+    --tile-pressed: rgba(0, 0, 0, 0.08);
+    --reveal: rgba(0, 0, 0, 0.06);
+
+    --text: #1a1a1a;
+    --text-dim: #5b5b5b;
+    --text-mute: #8a8a8a;
+
+    --accent: #0067c0;
+    --accent-hover: #1975c4;
+    --accent-pressed: #005ba1;
+    --accent-soft: rgba(0, 103, 192, 0.08);
+    --accent-text: #ffffff;
+
+    --danger: #c42b1c;
+    --danger-soft: rgba(196, 43, 28, 0.08);
+
+    --border: rgba(0, 0, 0, 0.08);
+    --border-strong: rgba(0, 0, 0, 0.14);
+    --divider: #e5e5e5;
+
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.10);
+    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.14);
+
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --radius-pill: 999px;
+
+    --font: "Segoe UI Variable", "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, "PingFang SC", "Microsoft YaHei UI", sans-serif;
+  }
+
+  [data-theme="dark"] {
+    --bg: #202020;
+    --mica: rgba(43, 43, 43, 0.7);
+    --mica-blur: rgba(32, 32, 32, 0.6);
+    --card: #2b2b2b;
+    --card-hover: #383838;
+    --tile: transparent;
+    --tile-hover: rgba(255, 255, 255, 0.06);
+    --tile-pressed: rgba(255, 255, 255, 0.10);
+    --reveal: rgba(255, 255, 255, 0.08);
+
+    --text: #ffffff;
+    --text-dim: #c7c7c7;
+    --text-mute: #8a8a8a;
+
+    --accent: #60cdff;
+    --accent-hover: #6dd5ff;
+    --accent-pressed: #4cc3ff;
+    --accent-soft: rgba(96, 205, 255, 0.12);
+    --accent-text: #000000;
+
+    --danger: #ff6b6b;
+    --danger-soft: rgba(255, 107, 107, 0.12);
+
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+    --divider: #3a3a3a;
+
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+  }
+
+  html, body { height: 100%; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    transition: background .2s, color .2s;
+  }
+
+  /* ===== 顶部窗口栏（仿 Win11 标题栏区域） ===== */
+  .titlebar {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    background: var(--mica);
+    backdrop-filter: blur(30px) saturate(120%);
+    -webkit-backdrop-filter: blur(30px) saturate(120%);
+    border-bottom: 1px solid var(--border);
+    user-select: none;
+    -webkit-app-region: drag;
+  }
+  .titlebar-left {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; color: var(--text-dim);
+    font-weight: 600;
+  }
+  .titlebar-left .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #1a9e3e;
+    box-shadow: 0 0 0 3px rgba(26, 158, 62, 0.2);
+  }
+  .titlebar-actions {
+    display: flex; gap: 4px;
+    -webkit-app-region: no-drag;
+  }
+  .titlebar-btn {
+    width: 32px; height: 28px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .12s;
+  }
+  .titlebar-btn:hover { background: var(--tile-hover); }
+  .titlebar-btn.close:hover {
+    background: #c42b1c; color: #fff;
+  }
+
+  /* ===== 主容器（仿 Win11 开始菜单居中浮动） ===== */
+  .menu-card {
+    position: relative;
+    width: 100%;
+    max-width: 640px;
+    margin: 48px auto 32px;
+    background: var(--mica);
+    backdrop-filter: blur(40px) saturate(140%);
+    -webkit-backdrop-filter: blur(40px) saturate(140%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    padding: 28px 28px 20px;
+  }
+
+  /* ===== 搜索框 ===== */
+  .search {
+    position: relative;
+    margin: 0 auto 24px;
+    max-width: 440px;
+  }
+  .search input {
+    width: 100%;
+    height: 36px;
+    padding: 0 38px 0 40px;
+    background: var(--card);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-pill);
+    color: var(--text);
+    font-size: 13px;
+    font-family: var(--font);
+    outline: none;
+    transition: border .15s, box-shadow .15s, background .15s;
+  }
+  .search input::placeholder { color: var(--text-mute); }
+  .search input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+    background: var(--card);
+  }
+  .search .si {
+    position: absolute; left: 14px; top: 50%;
+    transform: translateY(-50%);
+    width: 16px; height: 16px;
+    color: var(--text-dim);
+  }
+  .search .si svg { width: 100%; height: 100%; }
+  .search .kbd {
+    position: absolute; right: 10px; top: 50%;
+    transform: translateY(-50%);
+    padding: 2px 8px;
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-size: 10px; color: var(--text-dim);
+    font-family: ui-monospace, monospace;
+  }
+
+  /* ===== 章节标题（"已固定" 风格） ===== */
+  .section-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .section-head h2 {
+    font-size: 13px; font-weight: 600; color: var(--text);
+  }
+  .section-actions {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .pill-btn {
+    height: 28px;
+    padding: 0 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    color: var(--text-dim);
+    font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: background .12s, border-color .12s;
+    font-family: var(--font);
+  }
+  .pill-btn:hover {
+    background: var(--card-hover);
+    color: var(--text);
+  }
+
+  /* ===== 分类筛选条 ===== */
+  .filters {
+    display: flex; gap: 4px;
+    margin-bottom: 14px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: thin;
+  }
+  .filter {
+    height: 28px;
+    padding: 0 12px;
+    border: 1px solid transparent;
+    background: transparent;
+    border-radius: var(--radius-pill);
+    color: var(--text-dim);
+    font-size: 12px; font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .12s, color .12s;
+    font-family: var(--font);
+  }
+  .filter:hover {
+    background: var(--tile-hover);
+    color: var(--text);
+  }
+  .filter.active {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-color: var(--accent-soft);
+  }
+  .filter .n {
+    margin-left: 5px;
+    color: var(--text-mute);
+    font-weight: 400;
+  }
+  .filter.active .n { color: var(--accent); opacity: 0.7; }
+
+  /* ===== 应用网格（仿 Win11 pinned 区） ===== */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+  }
+  @media (max-width: 540px) {
+    .grid { grid-template-columns: repeat(4, 1fr); }
+  }
+  @media (max-width: 420px) {
+    .grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .tile {
+    position: relative;
+    background: var(--tile);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    padding: 12px 6px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: background .12s, border-color .12s;
+    overflow: hidden;
+  }
+  .tile::after {
+    content: ""; position: absolute; inset: 0;
+    border-radius: var(--radius-md);
+    box-shadow: 0 0 0 1px var(--reveal) inset;
+    opacity: 0; transition: opacity .15s;
+    pointer-events: none;
+  }
+  .tile:hover {
+    background: var(--tile-hover);
+  }
+  .tile:hover::after { opacity: 1; }
+  .tile:active {
+    background: var(--tile-pressed);
+  }
+  .tile .icon {
+    width: 32px; height: 32px;
+    margin: 0 auto 8px;
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+  [data-theme="dark"] .tile .icon {
+    background: var(--card-hover);
+  }
+  .tile .icon img { width: 100%; height: 100%; object-fit: cover; }
+  .tile .name {
+    font-size: 11px; font-weight: 400; color: var(--text);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .tile .menu {
+    position: absolute; top: 4px; right: 4px;
+    width: 22px; height: 22px; border-radius: var(--radius-sm);
+    background: var(--card); border: 1px solid var(--border);
+    display: none; align-items: center; justify-content: center;
+    font-size: 14px; color: var(--text-dim); cursor: pointer;
+    line-height: 1;
+    box-shadow: var(--shadow-sm);
+  }
+  .tile:hover .menu { display: flex; }
+  .tile .menu:hover { background: var(--tile-hover); color: var(--text); }
+
+  /* Tile 类型角标：网页 / 原生App */
+  .tile .badge {
+    position: absolute; top: 8px; left: 8px;
+    height: 14px; padding: 0 5px;
+    border-radius: 3px;
+    font-size: 9px; font-weight: 600;
+    line-height: 14px;
+    letter-spacing: 0.02em;
+    background: rgba(128,128,128,0.16);
+    color: var(--text-dim);
+    pointer-events: none;
+  }
+  [data-theme="dark"] .tile .badge { background: rgba(200,200,200,0.12); }
+  .tile.type-native .badge {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .empty {
+    grid-column: 1 / -1; text-align: center;
+    padding: 50px 20px; color: var(--text-dim);
+    font-size: 13px;
+  }
+  .empty .ico { font-size: 32px; opacity: 0.5; margin-bottom: 8px; }
+
+  /* ===== 底部栏（仿 Win11 用户栏） ===== */
+  .footer-bar {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--divider);
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; color: var(--text-dim);
+  }
+  .footer-bar .stat {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .footer-bar .stat .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent);
+  }
+  .footer-bar .power {
+    width: 30px; height: 30px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-dim);
+    transition: background .12s, color .12s;
+  }
+  .footer-bar .power:hover {
+    background: var(--card-hover);
+    color: var(--text);
+  }
+
+  /* ===== 模态对话框（Win11 细腻版） ===== */
+
+  /* 遮罩层：Win11 那种不那么黑的深色玻璃，带微模糊，有淡入淡出 */
+  .overlay {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(14px) saturate(120%);
+    -webkit-backdrop-filter: blur(14px) saturate(120%);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 220ms cubic-bezier(.4, 0, .2, 1);
+  }
+  .overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* 弹窗本体：多层阴影 (ambient + directional) + Mica + 极细描边 */
+  .modal {
+    position: relative;
+    background: var(--card);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;                    /* Win11 ContentDialog 圆角 */
+    padding: 0;                            /* 改为分区内边距，避免顶部留空 */
+    width: 100%; max-width: 448px;
+    /* Win11 弹窗阴影：环境光 + 定向 + 1px 顶部高光 */
+    box-shadow:
+      0 32px 64px -24px rgba(0, 0, 0, 0.32),
+      0 8px 20px -8px rgba(0, 0, 0, 0.18),
+      0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+    transform: translateY(12px) scale(0.97);
+    opacity: 0;
+    transition:
+      transform 260ms cubic-bezier(.2, .9, .3, 1.1),
+      opacity   220ms cubic-bezier(.4, 0, .2, 1);
+    overflow: hidden;
+  }
+  [data-theme="light"] .modal {
+    box-shadow:
+      0 32px 64px -24px rgba(0, 0, 0, 0.22),
+      0 8px 20px -8px rgba(0, 0, 0, 0.10),
+      0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+  }
+  .overlay.show .modal {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  /* 弹窗分区：头部 / 内容区 / 按钮区 */
+  .modal-header {
+    padding: 22px 24px 6px;
+  }
+  .modal h2 {
+    font-size: 15px; font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    margin: 0;
+  }
+  .modal .sub {
+    font-size: 12px; color: var(--text-dim);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+  .modal-body {
+    padding: 14px 24px 4px;
+  }
+  .modal-footer {
+    padding: 16px 24px 20px;
+    /* Win11 按钮区顶部有 1px 分割线 + 极浅渐变做区分 */
+    background: linear-gradient(180deg,
+      transparent 0%,
+      rgba(0,0,0,0.015) 100%);
+    border-top: 1px solid var(--divider);
+  }
+  [data-theme="dark"] .modal-footer {
+    background: linear-gradient(180deg,
+      transparent 0%,
+      rgba(255,255,255,0.02) 100%);
+  }
+
+  /* ===== 输入框 / 下拉：Win11 TextBox 规范 ===== */
+  .field {
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .field label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-dim);
+    font-weight: 500;
+    margin-bottom: 6px;
+    letter-spacing: 0.01em;
+  }
+  .field .input-wrap {
+    position: relative;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%; height: 32px;
+    padding: 0 12px;
+    background: var(--card);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: var(--font);
+    outline: none;
+    transition:
+      border-color 150ms ease,
+      box-shadow 150ms ease,
+      background-color 150ms ease;
+  }
+  .field textarea {
+    height: auto; padding: 8px 10px; line-height: 1.5;
+  }
+  .field select {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 30px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23707070' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+  }
+  [data-theme="dark"] .field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23aaaaaa' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  }
+
+  /* 分组单选（Win11 Segmented Control：类型选择） */
+  .seg {
+    display: inline-flex;
+    padding: 2px;
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+    border-radius: 5px;
+    gap: 2px;
+    width: 100%;
+  }
+  .seg button {
+    flex: 1;
+    height: 28px;
+    border: none;
+    background: transparent;
+    border-radius: 3px;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-family: var(--font);
+    font-size: 12px; font-weight: 500;
+    transition: background-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
+  }
+  .seg button:hover { color: var(--text); }
+  .seg button.active {
+    background: var(--card);
+    color: var(--text);
+    box-shadow: var(--shadow-sm), 0 0 0 1px var(--border);
+  }
+  .seg button .hint {
+    font-weight: 400; color: var(--text-mute); margin-left: 4px; font-size: 10px;
+  }
+  .seg button.active .hint { color: var(--text-dim); }
+
+  /* 状态分层：默认 → hover → focus */
+  .field input:hover, .field select:hover, .field textarea:hover {
+    border-color: var(--text-mute);
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--accent);
+    /* Win11 风格的 1px 内高光 + 外层光晕 */
+    box-shadow:
+      0 0 0 3px var(--accent-soft),
+      0 0 0 1px var(--accent) inset;
+    background: var(--card);
+  }
+  .field input::placeholder,
+  .field textarea::placeholder {
+    color: var(--text-mute);
+  }
+
+  /* 错误态 */
+  .field.invalid input,
+  .field.invalid select {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px var(--danger-soft);
+  }
+  .field .err {
+    position: absolute;
+    left: 0; right: 0; bottom: -16px;
+    font-size: 11px; color: var(--danger);
+    opacity: 0; transform: translateY(-2px);
+    transition: opacity 150ms ease, transform 150ms ease;
+    pointer-events: none;
+  }
+  .field.invalid .err { opacity: 1; transform: translateY(0); }
+  .field.invalid { margin-bottom: 22px; } /* 为错误文案预留空间 */
+
+  .field-row {
+    display: flex;
+    gap: 12px;
+  }
+  .field-row .field {
+    flex: 1;
+  }
+
+  /* ===== 按钮：Win11 AccentButton / SecondaryButton / DangerButton ===== */
+  .btn {
+    height: 32px;
+    padding: 0 16px;
+    background: var(--card);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 13px; font-weight: 400;
+    cursor: pointer;
+    font-family: var(--font);
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    position: relative;
+    transition:
+      background-color 120ms ease,
+      border-color 120ms ease,
+      box-shadow 120ms ease,
+      transform 80ms ease;
+    user-select: none;
+  }
+  /* Secondary（默认按钮）：默认 → hover 变浅灰 → active 按压下 */
+  .btn:hover {
+    background: var(--card-hover);
+    border-color: var(--text-mute);
+  }
+  .btn:active {
+    background: var(--tile-pressed);
+    transform: scale(0.98);
+  }
+  /* 键盘焦点：Win11 经典 2px 虚线圈（1px 外） */
+  .btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--accent);
+  }
+  /* Primary (Accent)：实心蓝 */
+  .btn.primary {
+    background: var(--accent);
+    color: var(--accent-text);
+    border-color: var(--accent);
+  }
+  .btn.primary:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+  }
+  .btn.primary:active {
+    background: var(--accent-pressed);
+    border-color: var(--accent-pressed);
+  }
+  .btn.primary:focus-visible {
+    box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--accent);
+  }
+  /* Danger：删除/危险按钮 */
+  .btn.danger {
+    color: var(--danger);
+    border-color: rgba(196, 43, 28, 0.5);
+    background: transparent;
+  }
+  .btn.danger:hover {
+    background: var(--danger-soft);
+    border-color: var(--danger);
+  }
+  .btn.danger:active {
+    background: rgba(196, 43, 28, 0.18);
+  }
+  .btn.danger:focus-visible {
+    box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--danger);
+  }
+
+  /* Footer 布局：Accent 永远右对齐，Danger 左对齐，中间填 Secondary */
+  .modal-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  .modal-actions .btn.danger {
+    margin-right: auto;
+  }
+
+  /* === 滚动条：Win11 细腻化处理 ===
+     1) 默认完全隐藏（轨道透明 + 滑块透明）
+     2) 滚动中 → 滑块以中等灰淡入（最"该出现"的时机）
+     3) 页面/容器 hover → 滑块以浅灰淡入，可点击
+     4) 滑块 hover → 滑块加深、宽度微微"膨胀"
+     5) 用 background-clip 实现滑块内缩，制造轨道留白
+  */
+  :root {
+    --sb-thin: 4px;      /* 静态宽度（隐藏状态） */
+    --sb-norm: 6px;      /* 显示/hover 宽度 */
+    --sb-thick: 10px;    /* 滑块hover宽度（伪膨胀） */
+    --sb-time: 220ms cubic-bezier(.4, 0, .2, 1);
+    --sb-idle: transparent;
+    --sb-hint: rgba(128, 128, 128, 0.22);     /* 滚动中/hover时淡入 */
+    --sb-show: rgba(128, 128, 128, 0.42);     /* 鼠标悬停滑块 */
+    --sb-peak: rgba(128, 128, 128, 0.68);     /* 鼠标悬停在滑块本身 */
+  }
+  [data-theme="dark"] {
+    --sb-hint: rgba(200, 200, 200, 0.18);
+    --sb-show: rgba(200, 200, 200, 0.36);
+    --sb-peak: rgba(220, 220, 220, 0.58);
+  }
+
+  /* 宽度的分层过渡：默认细 → 页面hover变宽 → 滑块hover最宽 */
+  ::-webkit-scrollbar {
+    width: var(--sb-thin); height: var(--sb-thin);
+    transition: width var(--sb-time), height var(--sb-time);
+  }
+  html:hover, body:hover, .filters:hover {
+    &::-webkit-scrollbar { width: var(--sb-norm); height: var(--sb-norm); }
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    /* 右侧留 2px 不贴近边线，营造 Win11 悬浮感 */
+    margin: 2px 2px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--sb-idle);
+    border-radius: 999px;
+    /* 内缩 1px 制造"滑块小于轨道"的留白感 */
+    border: 1px solid transparent;
+    background-clip: padding-box;
+    transition: background-color var(--sb-time);
+  }
+  /* 页面 hover → 所有滚动条显示浅色（可点击但不抢眼） */
+  html:hover *::-webkit-scrollbar-thumb,
+  html:hover::-webkit-scrollbar-thumb {
+    background-color: var(--sb-hint);
+  }
+  /* 正在滚动 → 用更高优先级显示淡灰（比hover更强，提示用户位置） */
+  body.scrolling *::-webkit-scrollbar-thumb,
+  body.scrolling::-webkit-scrollbar-thumb,
+  .filters.scrolling::-webkit-scrollbar-thumb {
+    background-color: var(--sb-show) !important;
+  }
+  /* 鼠标直接悬停在滑块上 → 颜色加深，再配合加粗感 */
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--sb-peak) !important;
+    /* "膨胀"：通过内边距模拟更宽的视觉效果 */
+    border-width: 0;
+  }
+  ::-webkit-scrollbar-corner { background: transparent; }
+
+  /* Firefox 版本 —— 近似行为 */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 220ms ease;
+  }
+  html:hover * { scrollbar-color: rgba(128,128,128,0.25) transparent; }
+  body.scrolling * { scrollbar-color: rgba(128,128,128,0.45) transparent; }
+  [data-theme="dark"] html:hover * { scrollbar-color: rgba(200,200,200,0.22) transparent; }
+  [data-theme="dark"] body.scrolling * { scrollbar-color: rgba(200,200,200,0.38) transparent; }
+
+  @media (max-width: 540px) {
+    .menu-card { margin: 16px 8px; padding: 20px 18px 16px; }
+    .search .kbd { display: none; }
+  }
+</style>
+</head>
+<body data-theme="light">
+
+<div class="titlebar">
+  <div class="titlebar-left">
+    <span class="dot"></span>
+    <span>AppHub</span>
+  </div>
+  <div class="titlebar-actions">
+    <button class="titlebar-btn" id="themeBtn" title="切换主题">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+      </svg>
+    </button>
+    <button class="titlebar-btn close" id="closeBtn" title="关闭">×</button>
+  </div>
+</div>
+
+<div class="menu-card">
+  <div class="search">
+    <span class="si">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>
+      </svg>
+    </span>
+    <input id="searchInput" type="text" placeholder="搜索应用或网址" />
+    <span class="kbd">/</span>
+  </div>
+
+  <div class="section-head">
+    <h2 id="sectionTitle">所有应用</h2>
+    <div class="section-actions">
+      <button class="pill-btn" id="addBtn">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        添加
+      </button>
+    </div>
+  </div>
+
+  <div class="filters" id="filters"></div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="footer-bar">
+    <div class="stat">
+      <span class="dot"></span>
+      <span id="stat">已固定 0 个应用</span>
+    </div>
+    <button class="power" id="exportBtn" title="导出/导入">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- 添加/编辑对话框 -->
+<div class="overlay" id="overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-header">
+      <h2 id="modalTitle">添加应用</h2>
+      <div class="sub" id="modalSub">把常用网站收纳到一个地方</div>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>类型</label>
+        <div class="seg" role="tablist" aria-label="类型">
+          <button type="button" data-type="web" class="active" role="tab" aria-selected="true">
+            网页<span class="hint">URL</span>
+          </button>
+          <button type="button" data-type="native" role="tab" aria-selected="false">
+            原生应用<span class="hint">包名</span>
+          </button>
+        </div>
+      </div>
+      <div class="field" data-field="name">
+        <label>名称 <span style="color:var(--danger)">*</span></label>
+        <input id="fName" type="text" placeholder="例如 GitHub" autocomplete="off" />
+        <div class="err">请填写名称</div>
+      </div>
+      <!-- 网页 -->
+      <div class="field" data-field="url" id="fUrlField">
+        <label>网址</label>
+        <input id="fUrl" type="text" placeholder="https://github.com" autocomplete="off" />
+      </div>
+      <!-- 原生应用 -->
+      <div class="field" data-field="pkg" id="fPkgField" style="display:none">
+        <label>包名</label>
+        <input id="fPkg" type="text" placeholder="com.tencent.mm" autocomplete="off" spellcheck="false" />
+        <div class="err" id="fPkgErr">包名格式不正确（至少两段 . 分隔）</div>
+        <div class="sub" style="margin-top:6px;font-size:11px;color:var(--text-mute);line-height:1.45">
+          在安卓版会通过 PackageManager 查询并使用 startActivity 启动该包名的主 Activity。
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field" data-field="icon">
+          <label>图标</label>
+          <input id="fIcon" type="text" placeholder="emoji 或图片 URL" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label>分类</label>
+          <select id="fCategory"></select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="modal-actions">
+        <button class="btn danger" id="delBtn" style="display:none">删除</button>
+        <button class="btn" id="cancelBtn">取消</button>
+        <button class="btn primary" id="saveBtn">确定</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 导出/导入对话框 -->
+<div class="overlay" id="ioOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ioTitle">
+    <div class="modal-header">
+      <h2 id="ioTitle">导出 / 导入</h2>
+      <div class="sub">备份或迁移你的应用列表</div>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>当前配置（复制即可导出，粘贴即可导入）</label>
+        <textarea id="ioArea" rows="8" autocomplete="off" spellcheck="false"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="modal-actions">
+        <button class="btn" id="ioCancel">关闭</button>
+        <button class="btn" id="ioImport">导入</button>
+        <button class="btn primary" id="ioCopy">复制</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const STORE_KEY = 'apphub.apps.v1';
+  const THEME_KEY = 'apphub.theme';
+
+  const CATEGORIES = ['常用', '工作', '开发', '社交', '媒体', '其他'];
+
+  const DEFAULT_APPS = [
+    { name: 'GitHub',    type: 'web',    url: 'https://github.com',     icon: '🐙', category: '开发' },
+    { name: 'Gmail',     type: 'web',    url: 'https://mail.google.com', icon: '✉️', category: '工作' },
+    { name: 'ChatGPT',   type: 'web',    url: 'https://chat.openai.com', icon: '🤖', category: '常用' },
+    { name: 'YouTube',   type: 'web',    url: 'https://youtube.com',     icon: '▶️', category: '媒体' },
+    { name: '微信',      type: 'native', pkg: 'com.tencent.mm',          icon: '💬', category: '社交' },
+    { name: 'Notion',    type: 'web',    url: 'https://notion.so',       icon: '📝', category: '工作' },
+    { name: 'Vercel',    type: 'web',    url: 'https://vercel.com',      icon: '▲',  category: '开发' },
+    { name: 'Spotify',   type: 'native', pkg: 'com.spotify.music',       icon: '🎵', category: '媒体' },
+    { name: '支付宝',    type: 'native', pkg: 'com.eg.android.AlipayGphone', icon: '💰', category: '常用' },
+    { name: '小红书',    type: 'native', pkg: 'com.xingin.xhs',          icon: '📕', category: '媒体' },
+    { name: '电话',      type: 'native', pkg: 'com.android.dialer',      icon: '📞', category: '常用' },
+    { name: 'Chrome',    type: 'native', pkg: 'com.android.chrome',      icon: '🌐', category: '常用' },
+  ];
+
+  // ---- state ----
+  let apps = load();
+  let activeCategory = '全部';
+  let query = '';
+  let editingId = null;
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (raw) {
+        let list = JSON.parse(raw);
+        // v1 → v2 迁移：补齐 type 字段（没有 type 的旧条目按 web 归类）
+        list = list.map(a => a.type ? a : { type: 'web', ...a });
+        return list;
+      }
+    } catch(e) {}
+    const seeded = DEFAULT_APPS.map((a, i) => ({ id: 'seed-' + i, ...a }));
+    save(seeded);
+    return seeded;
+  }
+  function save(list = apps) {
+    localStorage.setItem(STORE_KEY, JSON.stringify(list));
+  }
+  function uid() { return 'a-' + Date.now() + '-' + Math.random().toString(36).slice(2,6); }
+
+  // ---- render ----
+  const $filters = document.getElementById('filters');
+  const $grid = document.getElementById('grid');
+  const $stat = document.getElementById('stat');
+  const $sectionTitle = document.getElementById('sectionTitle');
+
+  function renderFilters() {
+    const counts = {};
+    apps.forEach(a => counts[a.category] = (counts[a.category] || 0) + 1);
+    const cats = ['全部', ...CATEGORIES];
+    $filters.innerHTML = cats.map(c => {
+      const n = c === '全部' ? apps.length : (counts[c] || 0);
+      return `<button class="filter ${c === activeCategory ? 'active' : ''}" data-cat="${c}">${c}<span class="n">${n}</span></button>`;
+    }).join('');
+    $filters.querySelectorAll('.filter').forEach(f => {
+      f.onclick = () => { activeCategory = f.dataset.cat; renderFilters(); renderGrid(); };
+    });
+  }
+
+  function renderGrid() {
+    let list = apps;
+    if (activeCategory !== '全部') list = list.filter(a => a.category === activeCategory);
+    if (query) {
+      const q = query.toLowerCase();
+      list = list.filter(a =>
+        a.name.toLowerCase().includes(q) ||
+        (a.url || '').toLowerCase().includes(q) ||
+        (a.pkg || '').toLowerCase().includes(q)
+      );
+    }
+
+    $sectionTitle.textContent = query ? `搜索 "${query}"` : (activeCategory === '全部' ? '所有应用' : activeCategory);
+    $stat.textContent = `已固定 ${list.length} / ${apps.length} 个应用`;
+
+    if (!list.length) {
+      $grid.innerHTML = `<div class="empty"><div class="ico">🔍</div>没有匹配的应用</div>`;
+      return;
+    }
+    $grid.innerHTML = list.map(a => {
+      const iconHTML = a.icon && /^https?:\/\//.test(a.icon)
+        ? `<img src="${a.icon}" alt="" onerror="this.replaceWith(document.createTextNode('${(a.name[0] || '📦').replace(/'/g,'')}'))">`
+        : escapeHTML(a.icon || '📦');
+      const typeCls = a.type === 'native' ? 'type-native' : '';
+      const badge = a.type === 'native'
+        ? `<span class="badge" title="原生应用：${escapeHTML(a.pkg || '')}">APP</span>`
+        : `<span class="badge" title="网页书签">WEB</span>`;
+      return `
+        <div class="tile ${typeCls}" data-id="${a.id}">
+          ${badge}
+          <div class="menu" data-act="edit" title="编辑">⋯</div>
+          <div class="icon">${iconHTML}</div>
+          <div class="name">${escapeHTML(a.name)}</div>
+        </div>`;
+    }).join('');
+
+    $grid.querySelectorAll('.tile').forEach(el => {
+      const id = el.dataset.id;
+      el.querySelector('.menu').onclick = (e) => { e.stopPropagation(); openModal(id); };
+      el.onclick = () => launch(id);
+    });
+  }
+
+  function launch(id) {
+    const a = apps.find(x => x.id === id);
+    if (!a) return;
+    if (a.type === 'native' && a.pkg) {
+      // 原型里无法启动原生 app，提示用户这是 Android 专属
+      // 实际安卓工程里用 startActivity(getLaunchIntentForPackage(pkg))
+      const note = document.createElement('div');
+      note.style.cssText = `
+        position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%);
+        background: var(--card); color: var(--text);
+        padding: 10px 16px; border-radius: 6px;
+        border: 1px solid var(--border-strong);
+        box-shadow: 0 8px 20px -6px rgba(0,0,0,.2);
+        font-size: 12px; z-index: 200;
+        animation: toastIn .25s ease;
+      `;
+      note.textContent = `✅ 安卓版将启动 ${a.pkg}`;
+      document.body.appendChild(note);
+      setTimeout(() => { note.style.opacity = '0'; note.style.transition = 'opacity .2s'; }, 1400);
+      setTimeout(() => note.remove(), 1700);
+      return;
+    }
+    if (a.url) window.open(a.url, '_blank', 'noopener');
+  }
+  // toast 动画
+  if (!document.querySelector('#toastStyle')) {
+    const s = document.createElement('style');
+    s.id = 'toastStyle';
+    s.textContent = `@keyframes toastIn { from { opacity:0; transform: translate(-50%, 10px);} to { opacity:1; transform: translate(-50%, 0);} }`;
+    document.head.appendChild(s);
+  }
+
+  function escapeHTML(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+  }
+
+  // ---- Modal 栈：统一管理弹层（打开/关闭/锁滚动/ESC层级/焦点） ----
+  const $overlay    = document.getElementById('overlay');
+  const $ioOverlay  = document.getElementById('ioOverlay');
+  const $modalTitle = document.getElementById('modalTitle');
+  const $modalSub   = document.getElementById('modalSub');
+  const $fName      = document.getElementById('fName');
+  const $fUrl       = document.getElementById('fUrl');
+  const $fPkg       = document.getElementById('fPkg');
+  const $fIcon      = document.getElementById('fIcon');
+  const $fCategory  = document.getElementById('fCategory');
+  const $delBtn     = document.getElementById('delBtn');
+  const $ioArea     = document.getElementById('ioArea');
+  const $fUrlField  = document.getElementById('fUrlField');
+  const $fPkgField  = document.getElementById('fPkgField');
+  const $typeSeg    = $overlay.querySelector('.seg');
+  let modalType = 'web'; // 'web' | 'native'
+
+  function setModalType(type) {
+    modalType = type;
+    $typeSeg.querySelectorAll('button').forEach(b => {
+      const on = b.dataset.type === type;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    $fUrlField.style.display = type === 'web' ? '' : 'none';
+    $fPkgField.style.display = type === 'native' ? '' : 'none';
+    setFieldInvalid($overlay.querySelector('[data-field="pkg"]'), false);
+    setFieldInvalid($overlay.querySelector('[data-field="url"]'), false);
+  }
+  $typeSeg?.querySelectorAll('button').forEach(b => {
+    b.onclick = () => setModalType(b.dataset.type);
+  });
+
+  const MODAL_ANIM_MS = 260; // 与 CSS transition 匹配
+  const modalStack = []; // 后入先出，ESC 只关最上层
+  let bodyPrevOverflow = '';
+  let focusPrev = null;   // 保存打开前焦点，关闭时返还
+
+  function lockBodyScroll(locked) {
+    if (locked) {
+      bodyPrevOverflow = bodyPrevOverflow || document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+    } else if (modalStack.length === 0) {
+      document.body.style.overflow = bodyPrevOverflow || '';
+      bodyPrevOverflow = '';
+    }
+  }
+
+  function pushModal(overlayEl, focusEl) {
+    if (modalStack.length === 0) {
+      focusPrev = document.activeElement;
+    }
+    modalStack.push(overlayEl);
+    // 给弹层 z-index 按栈深度分级（100 + depth*10），避免上层被下层盖
+    overlayEl.style.zIndex = 100 + (modalStack.length - 1) * 10;
+    overlayEl.classList.add('show');
+    lockBodyScroll(true);
+    // 等待下一帧再 focus，确保 transition 触发
+    requestAnimationFrame(() => {
+      setTimeout(() => focusEl && focusEl.focus({ preventScroll: true }), 60);
+    });
+  }
+
+  function popModal() {
+    const overlayEl = modalStack.pop();
+    if (!overlayEl) return;
+    overlayEl.classList.remove('show');
+    lockBodyScroll(false);
+    // 动画结束后再处理 DOM 清理（如果有）和焦点返还
+    setTimeout(() => {
+      if (modalStack.length === 0 && focusPrev) {
+        focusPrev.focus({ preventScroll: true });
+        focusPrev = null;
+      }
+    }, MODAL_ANIM_MS);
+  }
+
+  // 判断当前是否有 overlay 开着
+  function topOverlay() {
+    return modalStack[modalStack.length - 1];
+  }
+
+  // --- 字段错误态（不跳 alert，细腻反馈） ---
+  function setFieldInvalid(fieldEl, invalid) {
+    if (!fieldEl) return;
+    fieldEl.classList.toggle('invalid', !!invalid);
+  }
+  function clearFormErrors(formRoot) {
+    formRoot.querySelectorAll('.field.invalid').forEach(f => f.classList.remove('invalid'));
+  }
+
+  function fillCategorySelect() {
+    $fCategory.innerHTML = CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join('');
+  }
+
+  function openModal(id = null) {
+    editingId = id;
+    const app = id ? apps.find(a => a.id === id) : null;
+    $modalTitle.textContent = id ? '编辑应用' : '添加应用';
+    $modalSub.textContent = id ? '修改这个应用的资料' : '添加网站书签或安卓原生应用';
+    setModalType(app?.type || 'web');
+    $fName.value = app ? app.name : '';
+    $fUrl.value  = (app && app.url)  ? app.url  : '';
+    $fPkg.value  = (app && app.pkg)  ? app.pkg  : '';
+    $fIcon.value = app ? app.icon : '';
+    $fCategory.value = app ? app.category : CATEGORIES[0];
+    $delBtn.style.display = id ? 'inline-flex' : 'none';
+    clearFormErrors($overlay.querySelector('.modal-body'));
+    pushModal($overlay, $fName);
+  }
+  function closeModal() {
+    // 只关最上层 & 必须是自己
+    if (topOverlay() !== $overlay) return;
+    popModal();
+    editingId = null;
+  }
+
+  const PKG_RE = /^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z0-9_]+)+$/;
+  function saveApp() {
+    const name = $fName.value.trim();
+    let url = $fUrl.value.trim();
+    const pkg = $fPkg.value.trim();
+
+    // 表单校验
+    let ok = true;
+    const fName = $overlay.querySelector('[data-field="name"]');
+    const fPkg  = $overlay.querySelector('[data-field="pkg"]');
+    const fUrl  = $overlay.querySelector('[data-field="url"]');
+    if (!name) { setFieldInvalid(fName, true); ok = false; }
+    else setFieldInvalid(fName, false);
+
+    if (modalType === 'native') {
+      if (!pkg || !PKG_RE.test(pkg)) { setFieldInvalid(fPkg, true); ok = false; }
+      else setFieldInvalid(fPkg, false);
+    }
+
+    if (!ok) {
+      // focus 到第一个错误字段
+      const firstErr = [
+        [!$fName.value, $fName],
+        [modalType === 'native' && !PKG_RE.test(pkg), $fPkg],
+      ].find(x => x[0]);
+      if (firstErr) firstErr[1].focus({ preventScroll: true });
+      return;
+    }
+
+    if (modalType === 'web' && url && !/^https?:\/\//.test(url)) url = 'https://' + url;
+    const base = {
+      name,
+      icon: $fIcon.value.trim() || '📦',
+      category: $fCategory.value,
+    };
+    const data = modalType === 'native'
+      ? { ...base, type: 'native', pkg, url: '' }
+      : { ...base, type: 'web',    url, pkg: '' };
+    if (editingId) {
+      apps = apps.map(a => a.id === editingId ? { ...a, ...data } : a);
+    } else {
+      apps.push({ id: uid(), ...data });
+    }
+    save();
+    closeModal();
+    renderFilters();
+    renderGrid();
+  }
+
+  function deleteApp() {
+    if (!editingId) return;
+    if (!confirm('确定删除这个应用？')) return;
+    apps = apps.filter(a => a.id !== editingId);
+    save();
+    closeModal();
+    renderFilters();
+    renderGrid();
+  }
+
+  // 输入时实时清除对应字段错误
+  $fName.addEventListener('input', () => setFieldInvalid($overlay.querySelector('[data-field="name"]'), false));
+  $fPkg.addEventListener('input', () => {
+    const val = $fPkg.value.trim();
+    const ok = !val || PKG_RE.test(val);
+    setFieldInvalid($overlay.querySelector('[data-field="pkg"]'), !ok);
+  });
+
+  document.getElementById('addBtn').onclick = () => openModal();
+  document.getElementById('saveBtn').onclick = saveApp;
+  document.getElementById('cancelBtn').onclick = closeModal;
+  $delBtn.onclick = deleteApp;
+  // 点遮罩关闭（但必须是栈顶）
+  $overlay.onclick = (e) => { if (e.target === $overlay && topOverlay() === $overlay) closeModal(); };
+
+  // search
+  document.getElementById('searchInput').oninput = (e) => {
+    query = e.target.value.trim();
+    renderGrid();
+  };
+
+  // theme
+  const $themeBtn = document.getElementById('themeBtn');
+  function applyTheme(t) {
+    document.body.dataset.theme = t;
+    localStorage.setItem(THEME_KEY, t);
+  }
+  $themeBtn.onclick = () => {
+    const next = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+  };
+
+  // 关闭按钮（视觉反馈）
+  document.getElementById('closeBtn').onclick = () => {
+    if (confirm('退出 AppHub？（仅作演示，可重新打开页面恢复）')) {
+      document.body.style.opacity = '0.5';
+    }
+  };
+
+  // 导入/导出：改用统一栈
+  document.getElementById('exportBtn').onclick = () => {
+    $ioArea.value = JSON.stringify(apps, null, 2);
+    pushModal($ioOverlay, $ioArea);
+    // 打开时自动全选，方便复制
+    requestAnimationFrame(() => { setTimeout(() => $ioArea.select(), 200); });
+  };
+  document.getElementById('ioCancel').onclick = () => {
+    if (topOverlay() === $ioOverlay) popModal();
+  };
+  $ioOverlay.onclick = (e) => {
+    if (e.target === $ioOverlay && topOverlay() === $ioOverlay) popModal();
+  };
+  document.getElementById('ioCopy').onclick = async () => {
+    try {
+      await navigator.clipboard.writeText($ioArea.value);
+      const btn = document.getElementById('ioCopy');
+      const prev = btn.textContent;
+      btn.textContent = '✓ 已复制';
+      setTimeout(() => btn.textContent = prev, 1200);
+    } catch {
+      $ioArea.select();
+      document.execCommand('copy');
+    }
+  };
+  document.getElementById('ioImport').onclick = () => {
+    try {
+      const parsed = JSON.parse($ioArea.value);
+      if (!Array.isArray(parsed)) throw new Error('不是数组');
+      apps = parsed.map(a => ({ id: a.id || uid(), ...a }));
+      save();
+      renderFilters();
+      renderGrid();
+      if (topOverlay() === $ioOverlay) popModal();
+    } catch(e) {
+      const btn = document.getElementById('ioImport');
+      const prev = btn.textContent;
+      btn.textContent = '✕ 解析失败';
+      btn.classList.add('danger');
+      setTimeout(() => {
+        btn.textContent = prev;
+        btn.classList.remove('danger');
+      }, 1500);
+    }
+  };
+
+  // 键盘：ESC 只关最上层；Enter 只在最上层是编辑弹窗时触发保存
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const top = topOverlay();
+      if (top === $overlay) closeModal();
+      else if (top === $ioOverlay) popModal();
+    }
+    if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+      if (modalStack.length === 0) {
+        e.preventDefault();
+        document.getElementById('searchInput').focus();
+      }
+    }
+    // Enter 保存（只在编辑弹窗为最顶层、且不是在 textarea 中）
+    if (e.key === 'Enter' && topOverlay() === $overlay
+        && document.activeElement.tagName !== 'TEXTAREA'
+        && !(e.ctrlKey || e.metaKey || e.shiftKey || e.altKey)) {
+      // Submit 在多行输入里不拦截
+      if (document.activeElement === $fUrl || document.activeElement === $fName ||
+          document.activeElement === $fIcon || document.activeElement === $fCategory) {
+        e.preventDefault();
+        saveApp();
+      }
+    }
+  });
+
+  // === 滚动条"滚动中加深"：监听滚动，加 body.scrolling / .filters.scrolling
+  (function installScrollHint() {
+    let bodyTimer = null;
+    window.addEventListener('scroll', () => {
+      document.body.classList.add('scrolling');
+      clearTimeout(bodyTimer);
+      bodyTimer = setTimeout(() => document.body.classList.remove('scrolling'), 480);
+    }, { passive: true });
+
+    const $filters = document.getElementById('filters');
+    if ($filters) {
+      let filterTimer = null;
+      $filters.addEventListener('scroll', () => {
+        $filters.classList.add('scrolling');
+        clearTimeout(filterTimer);
+        filterTimer = setTimeout(() => $filters.classList.remove('scrolling'), 480);
+      }, { passive: true });
+    }
+  })();
+
+  // init
+  applyTheme(localStorage.getItem(THEME_KEY) || 'light');
+  fillCategorySelect();
+  renderFilters();
+  renderGrid();
+</script>
+</body>
+</html>
