@@ -10,6 +10,8 @@
 [![Kotlin 2.0](https://img.shields.io/badge/Kotlin-2.0-7F52FF.svg)](#)
 [![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-BOM%202024.10-4285F4.svg)](#)
 
+<img src="https://raw.githubusercontent.com/x2it/apphub-launcher/main/banner.png" alt="AppHub 启动器 · AppHub Launcher" width="100%">
+
 ---
 
 ## ✨ 特性 / Features
@@ -228,3 +230,7 @@ android/app/build/outputs/apk/debug/app-debug.apk
 <p align="center">
   <b>Made with ♥ by 知行工作室</b>
 </p>
+
+---
+
+[MIT](LICENSE) © 2026 知行工作室 Zhixing Studio · [https://w3b.pub/](https://w3b.pub/) · support@w3b.pub
