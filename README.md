@@ -4,6 +4,8 @@
 >
 > 一个 Windows 11 风格的 Android 启动器，在同一界面统一管理原生应用与网页书签。
 
+**当前版本 Current version：1.0.0**（见 `android/app/build.gradle`，versionCode 1）
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform: Android](https://img.shields.io/badge/Platform-Android-3DDC84.svg)](#)
 [![Min SDK: 26](https://img.shields.io/badge/Min%20SDK-26-green.svg)](#)
