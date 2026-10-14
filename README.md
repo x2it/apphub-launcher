@@ -129,7 +129,7 @@ apphub-launcher/
 ├── prototype.html                   # Web 原型（浏览器直接打开）
 ├── release/
 │   └── AppHub-debug.apk             # 已构建 debug 安装包
-├── LICENSE                          # MIT License © 知行工作室
+├── LICENSE                          # MIT License © 2026 知行工作室
 ├── README.md
 └── .gitignore
 ```
@@ -223,7 +223,7 @@ android/app/build/outputs/apk/debug/app-debug.apk
 
 ## 📜 开源协议 / License
 
-本项目基于 **MIT License** 开源，版权所有 © **2026 知行工作室 (Zhixing Studio)**。
+本项目基于 **MIT License** 开源，版权所有 © **2026 知行工作室**。
 
 完整协议详见 [LICENSE](LICENSE) 文件。
 
@@ -235,4 +235,4 @@ android/app/build/outputs/apk/debug/app-debug.apk
 
 ---
 
-[MIT](LICENSE) © 2026 知行工作室 Zhixing Studio · [https://w3b.pub/](https://w3b.pub/) · support@w3b.pub
+[MIT](LICENSE) © 2026 知行工作室 · [https://w3b.pub/](https://w3b.pub/) · support@w3b.pub
