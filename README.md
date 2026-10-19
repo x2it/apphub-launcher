@@ -16,51 +16,51 @@
 
 ---
 
-## ✨ 特性 / Features
+## 特性 / Features
 
 | 特性 | 说明 |
 |------|------|
-| 🪟 **Win11 风格 UI** | Mica-like 卡片、细腻阴影、圆角、分割线；支持浅色 / 深色主题切换 |
-| 🧭 **搜索** | 按应用名、URL、包名实时过滤 |
-| 🏷 **分类** | 常用 / 工作 / 开发 / 社交 / 媒体 / 其他，自适应 Chips + 数量徽章 |
-| 📱 **两种条目** | 原生 APP（通过包名 + `PackageManager` 启动主 Activity） + Web 书签（默认浏览器打开） |
-| 📥 **已装应用选择器** | 添加原生应用时，可直接扫描手机上已装的应用并自动填入包名 |
-| 💾 **Room 持久化** | 重启后数据不丢失 |
-| 📤 **JSON 导入导出** | 一键复制/粘贴完整配置，方便换机或备份 |
-| 🔔 **Toast + 触觉反馈** | 操作反馈细腻 |
-| 🎯 **Grid 自适应** | 不同屏幕尺寸下自适应网格大小 |
-| 🧩 **Web 原型** | 仓库内含 [prototype.html](prototype.html)，浏览器直接打开即可预览交互 |
+| **Win11 风格 UI** | Mica-like 卡片、细腻阴影、圆角、分割线；支持浅色 / 深色主题切换 |
+| **搜索** | 按应用名、URL、包名实时过滤 |
+| **分类** | 常用 / 工作 / 开发 / 社交 / 媒体 / 其他，自适应 Chips + 数量徽章 |
+| **两种条目** | 原生 APP（通过包名 + `PackageManager` 启动主 Activity） + Web 书签（默认浏览器打开） |
+| **已装应用选择器** | 添加原生应用时，可直接扫描手机上已装的应用并自动填入包名 |
+| **Room 持久化** | 重启后数据不丢失 |
+| **JSON 导入导出** | 一键复制/粘贴完整配置，方便换机或备份 |
+| **Toast + 触觉反馈** | 操作反馈细腻 |
+| **Grid 自适应** | 不同屏幕尺寸下自适应网格大小 |
+| **Web 原型** | 仓库内含 [prototype.html](prototype.html)，浏览器直接打开即可预览交互 |
 
 ---
 
-## 🖼 预览 / Preview
+## 预览 / Preview
 
 > 浏览器可先打开 `prototype.html` 体验完整交互原型。
 > 安装 APK 后在真机上即可看到与原型一致的 Win11 风格界面。
 
 ```
 ┌─────────────────────────────────────────────┐
-│  AppHub                          🔆  ↕️  ➕   │
+│  AppHub                                          │
 │  所有应用 · 12                                  │
 ├─────────────────────────────────────────────┤
-│  🔍 搜索应用 / 网址 / 包名                       │
+│  搜索应用 / 网址 / 包名                           │
 ├─────────────────────────────────────────────┤
 │  [全部(12)] [常用(3)] [工作(2)] [开发(3)] ... │
 ├─────────────────────────────────────────────┤
 │  ┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐       │
 │  │WEB │ │APP │ │WEB │ │APP │ │WEB │       │
-│  │ 🐙 │ │ 💬│ │ 🎵│ │ 📷│ │ 📧│       │
+│  │    │ │    │ │    │ │    │ │    │       │
 │  │GitHub│微信 │Spotify│相机 │Gmail │       │
 │  └────┘ └────┘ └────┘ └────┘ └────┘       │
 │  ...                                          │
 ├─────────────────────────────────────────────┤
-│  ● 已固定 12                       ↕️         │
+│  ● 已固定 12                                     │
 └─────────────────────────────────────────────┘
 ```
 
 ---
 
-## 📲 下载安装 / Installation
+## 下载安装 / Installation
 
 ### 方式一：直接下载 APK（推荐）
 
@@ -82,15 +82,15 @@ adb install -r release/AppHub-debug.apk
 
 ### 方式三：自行构建
 
-详见下方 [🔨 本地构建](#-本地构建--build-from-source) 章节。
+详见下方 [本地构建](#-本地构建--build-from-source) 章节。
 
 ---
 
-## 🛠 用法 / Usage
+## 用法 / Usage
 
 ### 添加条目
 
-1. 点击右上角 `➕` 按钮
+1. 点击右上角添加按钮
 2. 选择 **类型**：
    - `网页 URL` → 填网址（自动补齐 `https://`）
    - `原生应用 包名` → 填包名（如 `com.tencent.mm`），或点 `从已装应用选…` 扫描选择
@@ -107,11 +107,11 @@ adb install -r release/AppHub-debug.apk
 
 ### 导入导出
 
-点右上角 `↕️` 按钮 → `导出并复制`（把 JSON 复制到剪贴板备份）→ 或粘贴 JSON 后点 `导入` 还原。
+点右上角导入导出按钮 → `导出并复制`（把 JSON 复制到剪贴板备份）→ 或粘贴 JSON 后点 `导入` 还原。
 
 ---
 
-## 🧱 架构 / Architecture
+## 架构 / Architecture
 
 ```
 apphub-launcher/
@@ -149,7 +149,7 @@ apphub-launcher/
 
 ---
 
-## 🔨 本地构建 / Build from Source
+## 本地构建 / Build from Source
 
 ### 前置要求
 
@@ -196,7 +196,7 @@ android/app/build/outputs/apk/debug/app-debug.apk
 
 ---
 
-## 🧪 已知限制 / Limitations
+## 已知限制 / Limitations
 
 - 初次发布是 debug 签名版（`release/AppHub-debug.apk`），如需分发给他人建议生成 release keystore 并签名。
 - `QUERY_ALL_PACKAGES` 权限用于扫描已装应用。上架 Google Play 需要提交使用说明（或改用 `<queries>` 指定具体包）。
@@ -205,7 +205,7 @@ android/app/build/outputs/apk/debug/app-debug.apk
 
 ---
 
-## 🤝 贡献 / Contributing
+## 贡献 / Contributing
 
 欢迎 Issue / PR！
 
@@ -221,7 +221,7 @@ android/app/build/outputs/apk/debug/app-debug.apk
 
 ---
 
-## 📜 开源协议 / License
+## 开源协议 / License
 
 本项目基于 **MIT License** 开源，版权所有 © **2026 知行工作室**。
 
@@ -230,7 +230,7 @@ android/app/build/outputs/apk/debug/app-debug.apk
 ---
 
 <p align="center">
-  <b>Made with ♥ by 知行工作室</b>
+  <b>知行工作室 出品</b>
 </p>
 
 ---
