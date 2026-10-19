@@ -62,9 +62,11 @@
 
 ## 下载安装 / Installation
 
-### 方式一：直接下载 APK（推荐）
+> 预编译 APK 属于构建产物、不入库，将随 GitHub Release 提供；当前仓库尚未发布 Release，临时可按「方式三」自行构建。
 
-从仓库 `release/` 目录下载最新 debug 安装包：
+### 方式一：直接下载 APK（推荐，Release 发布后可用）
+
+Release 发布后从下载页获取最新 debug 安装包：
 
 ```
 release/AppHub-debug.apk   (16.8 MB)
@@ -124,11 +126,8 @@ apphub-launcher/
 │   │       ├── data/                # 数据层（Room 数据库 + InstalledAppRepository）
 │   │       └── ui/                  # UI 层（MainScreen / EditDialog / IODialog / Theme）
 │   ├── build.gradle                 # 根 Gradle（Groovy，buildscript classpath 方式，代理友好）
-│   ├── settings.gradle.kts          # 仓库显式 Maven URL，兼容沙箱代理
-│   └── gradle/wrapper/
+│   └── settings.gradle.kts          # 仓库显式 Maven URL，兼容沙箱代理
 ├── prototype.html                   # Web 原型（浏览器直接打开）
-├── release/
-│   └── AppHub-debug.apk             # 已构建 debug 安装包
 ├── LICENSE                          # MIT License © 2026 知行工作室
 ├── README.md
 └── .gitignore
